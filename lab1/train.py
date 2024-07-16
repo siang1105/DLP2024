@@ -34,13 +34,10 @@ def initialize_weights(input_dim, hidden_dim1, hidden_dim2, output_dim):
 # forward propagation
 def forward_propagation(X, W1, b1, W2, b2, W3, b3):
     z1 = np.dot(X, W1) + b1
-    # a1 = sigmoid(z1)
-    a1 = relu(z1)
+    a1 = sigmoid(z1)
     z2 = np.dot(a1, W2) + b2
-    # a2 = sigmoid(z2)
-    a2 = relu(z2)
+    a2 = sigmoid(z2)
     z3 = np.dot(a2, W3) + b3
-    # a3 = sigmoid(z3)
     a3 = sigmoid(z3)
     return z1, a1, z2, a2, z3, a3
 
@@ -51,11 +48,11 @@ def back_propagation(X, y, z1, a1, z2, a2, z3, a3, W1, W2, W3, b1, b2, b3, learn
     dW3 = np.dot(a2.T, dz3) / m
     db3 = np.sum(dz3, axis=0, keepdims=True) / m
 
-    dz2 = np.dot(dz3, W3.T) * derivative_relu(a2)
+    dz2 = np.dot(dz3, W3.T) * derivative_sigmoid(a2)
     dW2 = np.dot(a1.T, dz2) / m
     db2 = np.sum(dz2, axis=0, keepdims=True) / m
 
-    dz1 = np.dot(dz2, W2.T) * derivative_relu(a1)
+    dz1 = np.dot(dz2, W2.T) * derivative_sigmoid(a1)
     dW1 = np.dot(X.T, dz1) / m
     db1 = np.sum(dz1, axis=0, keepdims=True) / m
 
@@ -118,8 +115,8 @@ def show_result(x, y, pred_y, losses):
     plt.close()
 
 # generate dataset
-# X, y = generate_linear()
-X, y = generate_XOR_easy()
+X, y = generate_linear()
+# X, y = generate_XOR_easy()
 
 # defined layer
 input_dim = 2
@@ -127,7 +124,7 @@ hidden_dim1 = 4
 hidden_dim2 = 4
 output_dim = 1
 learning_rate = 0.1
-epochs = 50000
+epochs = 100000
 
 W1, b1, W2, b2, W3, b3, a3, loss, losses = train_neural_network(X, y, input_dim, hidden_dim1, hidden_dim2, output_dim, learning_rate, epochs)
 
