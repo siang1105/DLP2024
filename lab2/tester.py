@@ -33,7 +33,7 @@ def main():
     # load test dataser
     data_type = 'SD' # for changing model
 
-    test_dataset = MIBCI2aDataset(mode='test', data_type='LOSO')
+    test_dataset = MIBCI2aDataset(mode='test', data_type='SD')
     test_dataloader = DataLoader(test_dataset, batch_size=300, shuffle=False)
 
     if len(test_dataset) == 0:
