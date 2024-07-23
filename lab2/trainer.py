@@ -8,6 +8,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from model.SCCNet import SCCNet
 from Dataloader import MIBCI2aDataset
+from utils import plot_loss_accuracy
 
 # set random seed
 def set_seed(seed):
@@ -23,6 +24,9 @@ def set_seed(seed):
 def train_model(model, dataloader, criterion, optimizer, num_epochs=25):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
+
+    train_losses = []
+    train_accuracies = []
     
     for epoch in range(num_epochs):
         model.train()
@@ -45,9 +49,12 @@ def train_model(model, dataloader, criterion, optimizer, num_epochs=25):
 
         epoch_loss = running_loss / len(dataloader.dataset)
         epoch_accuracy = (correct / total) * 100
+        train_losses.append(epoch_loss)
+        train_accuracies.append(epoch_accuracy)
+
         print(f'Epoch {epoch + 1}/{num_epochs}, Training Loss: {epoch_loss:.4f}, Training Accuracy: {epoch_accuracy:.4f}')
 
-    return model
+    return model, train_losses, train_accuracies
 
 def main():
     set_seed(42)
@@ -65,7 +72,9 @@ def main():
     optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=0.0001)
 
     # train model
-    trained_model = train_model(model, train_dataloader, criterion, optimizer, num_epochs=1111)
+    trained_model, train_losses, train_accuracies = train_model(model, train_dataloader, criterion, optimizer, num_epochs=222)
+
+    plot_loss_accuracy(train_losses, train_accuracies, save_path=data_type)
 
     if data_type == 'FT':
         # load finetune dataset
@@ -78,8 +87,10 @@ def main():
         optimizer = optim.Adam(model.parameters(), lr=0.005, weight_decay=0.0001)
 
         # finetuned model
-        finetuned_model = train_model(model, finetune_dataloader, criterion, optimizer, num_epochs=287)
+        finetuned_model, train_losses, train_accuracies = train_model(model, finetune_dataloader, criterion, optimizer, num_epochs=287)
     
+        plot_loss_accuracy(train_losses, train_accuracies, save_path=data_type)
+
         # save model
         torch.save(finetuned_model.state_dict(), f'sccnet_{data_type}_model.pth')
         print(f'Model saved for {data_type}')
