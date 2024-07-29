@@ -8,7 +8,7 @@ import numpy as np
 from oxford_pet import load_dataset
 from models.unet import UNet
 from models.resnet34_unet import ResNet34_UNet
-from utils import dice_score, dice_loss
+from utils import dice_score, dice_loss, visualize_prediction
 import torch.nn as nn
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -38,7 +38,8 @@ def predict(args):
     criterion = nn.BCEWithLogitsLoss()
 
     with torch.no_grad():
-        for batch in data_loader:
+        # for batch in data_loader:
+        for idx, batch in enumerate(data_loader):
             images = batch['image'].to(device)
             masks = batch['mask'].to(device)
             outputs = model(images)
@@ -46,6 +47,10 @@ def predict(args):
             dice_scores.append(dice_score(outputs, masks).item())
             test_loss.append(criterion(outputs, masks).item() + dice_loss(outputs, masks).item())
             data_loader.set_postfix(loss=np.mean(test_loss), dice=np.mean(dice_scores))
+
+            # visualize_prediction
+            # if idx < 2:  
+            #     visualize_prediction(images.cpu(), masks.cpu(), outputs.cpu(), idx, "predictions")
 
     avg_dice = np.mean(dice_scores)
     avg_loss = np.mean(test_loss)
@@ -64,10 +69,3 @@ def get_args():
 if __name__ == '__main__':
     args = get_args()
     predict(args)
-
-
-
-# python3 inference.py --data_path ../dataset/oxford-iiit-pet --batch_size 16 --model unet
-# python3 inference.py --data_path ../dataset/oxford-iiit-pet --batch_size 16 --model resnet34_unet.pth
-
-# python3 inference.py --data_path ../dataset/oxford-iiit-pet --batch_size 16 --model best_model_unet_epoch126.pth

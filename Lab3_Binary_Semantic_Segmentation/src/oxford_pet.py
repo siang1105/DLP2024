@@ -7,8 +7,8 @@ from PIL import Image
 from tqdm import tqdm
 from urllib.request import urlretrieve
 import torchvision.transforms as transforms 
-import albumentations as alb #高效的圖像增強庫
-from albumentations.pytorch import ToTensorV2 #albumentations 中的模塊，用於將圖像轉換為 PyTorch 張量
+import albumentations as alb
+from albumentations.pytorch import ToTensorV2
 
 class OxfordPetDataset(torch.utils.data.Dataset):
     def __init__(self, root, mode="train", transform=None):
@@ -133,18 +133,17 @@ def extract_archive(filepath):
         shutil.unpack_archive(filepath, extract_dir)
 
 def load_dataset(data_path, mode):
-    #定義了訓練數據的圖像增強和預處理步驟。這些增強步驟有助於增加數據的多樣性，提高模型的泛化能力。
     train_transform = alb.Compose([
-        alb.Resize(256, 256), #將圖像調整為 256x256 像素
-        alb.HorizontalFlip(), #隨機水平翻轉圖像
-        alb.RandomResizedCrop(height=256, width=256, scale=(0.8, 1.0)), #隨機裁剪圖像並調整為 256x256 像素，裁剪比例在 80% 到 100% 之間
-        alb.ShiftScaleRotate(shift_limit=0.25, scale_limit=0.25, rotate_limit=30, p=0.5), #隨機平移、縮放和旋轉圖像
-        alb.ColorJitter(brightness=0.25, contrast=0.25, saturation=0.25, hue=0.25, p=0.5), #隨機調整圖像的亮度、對比度、飽和度和色調
-        alb.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)), #將圖像的每個通道進行標準化，使其具有零均值和單位標準差
-        ToTensorV2(), #將圖像轉換為 PyTorch 張量
+        alb.Resize(256, 256), #Resize image to 256x256 pixels
+        alb.HorizontalFlip(), #Randomly flip images horizontally
+        alb.RandomResizedCrop(height=256, width=256, scale=(0.8, 1.0)), #Randomly crop the image and resize it to 256x256 pixels, with a crop ratio between 80% and 100%
+        alb.ShiftScaleRotate(shift_limit=0.25, scale_limit=0.25, rotate_limit=30, p=0.5), #Randomly pan, zoom and rotate images
+        alb.ColorJitter(brightness=0.25, contrast=0.25, saturation=0.25, hue=0.25, p=0.5), #Randomly adjust the brightness, contrast, saturation and hue of an image
+        alb.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)), #Normalize each channel of the image to have zero mean and unit standard deviation
+        ToTensorV2(), #Convert image to PyTorch tensor
     ])
 
-    #定義了驗證和測試數據的圖像預處理步驟，這些步驟不包含數據增強，僅進行必要的標準化和格式轉換
+    #Image preprocessing steps for validation and test data are defined
     transform = alb.Compose([
         alb.Resize(256, 256),
         alb.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),

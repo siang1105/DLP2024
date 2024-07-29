@@ -1,4 +1,7 @@
 import torch
+import matplotlib.pyplot as plt
+import os
+import numpy as np
 
 def dice_score(pred_mask, gt_mask, eps = 1e-6):
     # Set predicted mask values ​​greater than 0.5 to 1.0, otherwise to 0.0
@@ -20,3 +23,13 @@ def dice_loss(pred_mask, gt_mask, eps=1e-8):
     # Calculate Dice loss, the formula is 1 - (2 * intersection / total number of pixels)
     loss = 1 - (2 * intersection / total_pix)
     return loss
+
+def visualize_prediction(images, masks, outputs, idx, save_path):
+    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+    axes[0].imshow(np.transpose(images[idx].numpy(), (1, 2, 0)))
+    axes[0].set_title('Input Image')
+    axes[1].imshow(masks[idx][0], cmap='gray')
+    axes[1].set_title('Ground Truth')
+    axes[2].imshow(outputs[idx][0] > 0.5, cmap='gray')
+    axes[2].set_title('Prediction')
+    plt.savefig(os.path.join(save_path, f'prediction_{idx}.png'))

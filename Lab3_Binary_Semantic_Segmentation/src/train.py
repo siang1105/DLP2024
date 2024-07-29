@@ -105,7 +105,7 @@ def train(args):
 def get_args():
     parser = argparse.ArgumentParser(description='Train the UNet or ResNet34_UNet on images and target masks')
     parser.add_argument('--data_path', type=str, help='path of the input data')
-    parser.add_argument('--epochs', '-e', type=int, default=200, help='number of epochs')
+    parser.add_argument('--epochs', '-e', type=int, default=100, help='number of epochs')
     parser.add_argument('--batch_size', '-b', type=int, default=16, help='batch size')
     parser.add_argument('--learning_rate', '-lr', type=float, default=1e-4, help='learning rate')
     parser.add_argument('--model', '-m', type=str, choices=['unet', 'resnet34_unet'], help='model type to use')
