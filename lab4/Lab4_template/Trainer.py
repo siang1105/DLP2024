@@ -57,10 +57,14 @@ class kl_annealing():
         return self.L[self.iter]
 
     def frange_cycle_linear(self, num_epoch, start = 0.0, stop = 1.0,  n_cycle = 1, ratio = 1):
+        # Initialize a schedule array filled with ones
         L = np.ones(num_epoch + 1)
+
+        # Calculate the period and step size for the schedule
         period = num_epoch / n_cycle
         step = (stop - start) / (period * ratio)
 
+        # Generate the cyclical annealing schedule
         for c in range(n_cycle):
             v , i = start , 0
             while v <= stop and (int(i + c * period) < num_epoch):
@@ -102,7 +106,7 @@ class VAE_Model(nn.Module):
         self.batch_size = args.batch_size
 
         # writer 
-        experiment_name = f"kl_{args.kl_anneal_type}_tfr_{args.tfr:.2f}_decay_{args.tfr_d_step:.2f}_400"
+        experiment_name = f"kl_{args.kl_anneal_type}_tfr_{args.tfr:.2f}_decay_{args.tfr_d_step:.2f}"
         self.writer = tensorboard.SummaryWriter(log_dir=f"logs/{experiment_name}")
 
         self.best_val_loss = float('inf')
