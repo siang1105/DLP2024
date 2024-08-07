@@ -128,9 +128,11 @@ class Test_model(VAE_Model):
         label_list = []
 
         for i in range(1, label.shape[0]):
+            past_frame = decoded_frame_list[i-1]
+            current_label = label[i]
 
-            frame_encoding = self.frame_transformation(decoded_frame_list[i-1].to(self.args.device))
-            pose_encoding = self.label_transformation(label[i]).to(self.args.device)
+            frame_encoding = self.frame_transformation(past_frame.to(self.args.device))
+            pose_encoding = self.label_transformation(current_label).to(self.args.device)
 
             z, mu, logvar = self.Gaussian_Predictor(frame_encoding, pose_encoding)
             z = torch.randn_like(z)
